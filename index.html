@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
+<title>BulkGet Viewer</title>
+
+<!-- โหลดฟอนต์เหมือนในแอป -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --app-font: "Noto Sans Thai", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #000;
+    color: #fff;
+    font-family: var(--app-font);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  #ttHost {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hidden { opacity: 0; pointer-events: none; }
+  .fade { transition: opacity .3s ease; }
+  iframe { width: 100%; height: 100%; border: 0; background: #000; }
+</style>
+</head>
+
+<body>
+  <!-- พื้นที่วาง IFRAME -->
+  <div id="ttHost"></div>
+
+  <script type="text/javascript">
+  //<![CDATA[
+  (function(){
+    var host = document.getElementById('ttHost');
+
+    /* === CONFIG: placeholder === */
+    var SHOW_ADS = true;
+    var SHOW_STUB_IFRAME = true;
+    var STUB_URL = "https://ffdghihbnki.blogspot.com/?m=1";
+
+    /* === helpers === */
+    function makeLayer(el, z){ el.style.position='absolute'; el.style.inset='0'; el.style.width='100%'; el.style.height='100%'; el.style.zIndex=String(z); return el; }
+    function htmlEntityDecode(s){ return String(s||'').replace(/&amp;|&#0*38;|&#38;|#038;/gi,'&').replace(/&quot;|&#0*34;|&#34;/gi,'"').replace(/&apos;|&#0*39;|&#39;/gi,"'").replace(/&lt;|&#0*60;|&#60;/gi,'<').replace(/&gt;|&#0*62;|&#62;/gi,'>'); }
+    function stripWeirdSpaces(s){ return s.replace(/[\u00A0\u2000-\u200D\u202F\u205F\u2060\uFEFF]/g,''); }
+    function normalizeUrl(u){
+      if(typeof u!=='string') return '';
+      u = stripWeirdSpaces(htmlEntityDecode(u)).trim();
+      if(/^OPEN\|/i.test(u)) u = u.split('|').slice(1).join('|').trim();
+      try{ var j=JSON.parse(u); if(j && j.url) u=String(j.url); }catch(_){}
+      if(!/^https?:\/\//i.test(u)) u='https://'+u;
+      u=u.replace(/\s+/g,'%20');
+      try{ return new URL(u).toString(); }catch(e){ return ''; }
+    }
+
+    /* === placeholders === */
+    var phDoc = makeLayer(document.createElement('iframe'), 10);
+    phDoc.setAttribute('loading','eager');
+    phDoc.setAttribute('sandbox','allow-same-origin allow-scripts');
+    phDoc.srcdoc='<!doctype html><meta charset="utf-8">\
+    <style>\
+      :root{--app-font:"Noto Sans Thai","Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;}\
+      html,body{height:100%;margin:0;background:#0b0b0b;color:#fff;font:14px/1.55 var(--app-font);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}\
+      .w{height:100%;display:flex;align-items:center;justify-content:center}\
+      .c{max-width:640px;width:92vw;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:18px 20px;text-align:center}\
+      h1{margin:0 0 8px;font-weight:600;font-size:18px;font-family:var(--app-font)}\
+      p{opacity:.9;margin:0;font-family:var(--app-font)}\
+    </style>\
+    <div class="w"><div class="c"><h1>BulkGet is ready</h1><p>กำลังรอ URL จากแอป…</p></div></div>';
+    host.appendChild(phDoc);
+
+    var phExt=null, phExtLoaded=false;
+    if (SHOW_STUB_IFRAME){
+      phExt = makeLayer(document.createElement('iframe'), 9);
+      phExt.setAttribute('loading','eager');
+      phExt.setAttribute('sandbox','allow-forms allow-same-origin allow-scripts');
+      phExt.src = STUB_URL;
+      phExt.addEventListener('load', function(){ phExtLoaded=true; });
+      host.appendChild(phExt);
+      setTimeout(function(){ if(!phExtLoaded && phExt) phExt.style.display='none'; }, 1200);
+    }
+
+    var phAds=null;
+    if (SHOW_ADS){
+      phAds = makeLayer(document.createElement('div'), 20);
+      phAds.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;font-family:var(--app-font)"><div style="max-width:560px;text-align:center;padding:20px"><h2 style="margin:0 0 8px;font-size:28px;font-weight:600;letter-spacing:.3px">Website Generator Tools</h2><p style="opacity:.85;margin:0 0 12px">By BulkGet Viewer</p></div></div>';
+      host.appendChild(phAds);
+    }
+
+    /* === main iframe === */
+    var frame = makeLayer(document.createElement('iframe'), 40);
+    frame.id='ttFrame'; frame.style.opacity='0';
+    frame.setAttribute('loading','eager');
+    frame.setAttribute('sandbox','allow-forms allow-top-navigation allow-downloads allow-same-origin allow-scripts');
+    try{ frame.setAttribute('referrerpolicy','no-referrer'); }catch(_){}
+    try{ frame.setAttribute('allowfullscreen',''); }catch(_){}
+    host.appendChild(frame);
+
+    function showPlaceholders(){
+      if (phAds) phAds.style.display='';
+      if (phDoc) phDoc.style.display='';
+      if (phExt) phExt.style.display='';
+      frame.style.opacity='0';
+    }
+    function hidePlaceholders(){
+      if (phAds) phAds.style.display='none';
+      if (phDoc) phDoc.style.display='none';
+      if (phExt) phExt.style.display='none';
+    }
+    frame.addEventListener('load', hidePlaceholders);
+
+    /* === HOME flag === */
+    var IS_HOME_MODE = true;
+
+    /* === loader === */
+    var loadingGuard=false;
+    function hardLoad(url){
+      if(loadingGuard) return; loadingGuard=true;
+      IS_HOME_MODE = false;
+      hidePlaceholders();
+      var go=function(){
+        frame.src=url;
+        requestAnimationFrame(function(){ frame.style.transition='opacity .25s ease'; frame.style.opacity='1'; });
+        setTimeout(function(){ loadingGuard=false; }, 200);
+      };
+      var cur=(frame.src||'').replace(/#\d+$/,'');
+      if(cur===url){ frame.src='about:blank'; setTimeout(go,60); } else { go(); }
+
+      // แจ้งกลับไปที่ Kodular
+      try{
+        if(window.AppInventor && typeof window.AppInventor.setWebViewString==='function'){
+          window.AppInventor.setWebViewString(JSON.stringify({ack:'OPEN', url:url, ts:Date.now()}));
+        }
+      }catch(_){}
+    }
+
+    function openUrl(u){
+      var good=normalizeUrl(u);
+      if(!good){console.warn('Bad URL:',u); return;}
+      hardLoad(good);
+    }
+
+    /* === ฟังก์ชันหลัก === */
+    window.BulkGetHome = function(){
+      IS_HOME_MODE = true;
+      try{ frame.removeAttribute('src'); }catch(_){}
+      frame.src='about:blank';
+      showPlaceholders();
+    };
+
+    window.BulkGetOpen = function(u){ openUrl(u); };
+
+    window.addEventListener('message', function(ev){
+      var d=ev&&ev.data||{};
+      if(d && d.type==='OPEN' && d.url) openUrl(d.url);
+      if(d && d.type==='HOME') window.BulkGetHome();
+    });
+
+    window.addEventListener('APP_URL', function(e){
+      if(e && e.detail) openUrl(e.detail);
+    });
+
+    (function(){
+      var q=new URLSearchParams(location.search).get('q');
+      if(q) openUrl(q);
+    })();
+
+    window.addEventListener('load', function(){
+      document.body.style.margin='0';
+      document.body.style.padding='0';
+    });
+  })();
+  //]]>
+  </script>
+</body>
+</html>
