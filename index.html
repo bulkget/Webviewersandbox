@@ -149,7 +149,70 @@
 })();
 //]]>
 </script>
+<!-- ========== BulkGet Bottom Banner (simple block) ========== -->
+<script>
+(function(){
+  /* CONFIG */
+  const B64_URL = "aHR0cHM6Ly9mZnkzaHd yZnNoZGhmd2RmaXNjZHRndi5ibG9nc3BvdC5jb20vP209MQ==".replace(/\s+/g,"");
+  const BANNER_IMG = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiRET_fJu-SFsp0dNiTM_livbOeqKMJ8E5M6Z5HsGpOkAd6_3_jPlgIZNGSNjg43oV-X1ZadNk8W61cxXCJxfrm7tmTyMNaFxBtQ1inDc5jHPd-QpD1yNvPNg0irGBdC9a04ENQuIGCcuqFh6c956k7uRcXs-rylHta02SrSb7HAOfHcgq9VpR4E1mZCA/s1000/20251016_012922.png";
+  const DEST_URL = atob(B64_URL); // แปลงกลับเป็นลิงก์จริง
 
+  /* BUILD */
+  const wrap = document.createElement('div');
+  wrap.id = 'bulkget_banner';
+  Object.assign(wrap.style, {
+    position:'fixed', left:'0', right:'0', bottom:'0', zIndex:'60',
+    display:'flex', justifyContent:'center',
+    pointerEvents:'none',
+    padding:'0 env(safe-area-inset-right) calc(8px + env(safe-area-inset-bottom)) env(safe-area-inset-left)'
+  });
+
+  const box = document.createElement('div');
+  Object.assign(box.style, {
+    pointerEvents:'auto',
+    position:'relative',
+    width:'min(1000px, 100%)',
+    margin:'0 8px',
+    borderRadius:'16px',
+    overflow:'hidden',
+    boxShadow:'0 10px 24px rgba(0,0,0,.45)',
+    background:'#0b0b0b'
+  });
+
+  const link = document.createElement('a');
+  link.href = DEST_URL;
+  link.target = '_top';
+  link.rel = 'noopener';
+  link.style.display = 'block';
+
+  const img = document.createElement('img');
+  img.src = BANNER_IMG;
+  img.alt = 'BulkGet App';
+  img.style.display = 'block';
+  img.style.width = '100%';
+  img.style.height = 'auto';
+  link.appendChild(img);
+
+  const close = document.createElement('button');
+  Object.assign(close.style, {
+    position:'absolute', right:'8px', top:'8px',
+    width:'36px', height:'36px', borderRadius:'999px',
+    border:'1px solid rgba(255,255,255,.25)',
+    background:'rgba(0,0,0,.55)', color:'#fff',
+    fontSize:'20px', lineHeight:'1',
+    display:'flex', alignItems:'center', justifyContent:'center',
+    cursor:'pointer'
+  });
+  close.textContent = '×';
+  close.onclick = e => { e.preventDefault(); wrap.remove(); };
+
+  box.appendChild(link);
+  box.appendChild(close);
+  wrap.appendChild(box);
+  document.body.appendChild(wrap);
+})();
+</script>
+<!-- ========== /BulkGet Bottom Banner ========== -->
   
 </body>
 </html>
