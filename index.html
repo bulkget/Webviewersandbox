@@ -114,7 +114,6 @@
     var cur=(frame.src||'').replace(/#\d+$/,'');
     if(cur===url){ frame.src='about:blank'; setTimeout(go,60); } else { go(); }
 
-    // แจ้ง ACK (ถ้าจับที่ Kodular)
     try{
       if(window.AppInventor && typeof window.AppInventor.setWebViewString==='function'){
         window.AppInventor.setWebViewString(JSON.stringify({ack:'OPEN', url:url, ts:Date.now()}));
@@ -123,7 +122,6 @@
   }
   function openUrl(u){ var good=normalizeUrl(u); if(!good){console.warn('Bad URL:',u); return;} hardLoad(good); }
 
-  /* === HOME จริง === */
   window.BulkGetHome = function(){
     IS_HOME_MODE = true;
     try{ frame.removeAttribute('src'); }catch(_){}
@@ -131,8 +129,6 @@
     showPlaceholders();
   };
 
-  /* === ช่องทางรับค่า (ไม่ใช้โพลล์แล้ว) === */
-  // เปิดผ่านฟังก์ชันโดยตรง (ให้ Kodular เรียก)
   window.BulkGetOpen = function(u){ openUrl(u); };
 
   // postMessage แบบ {type:'OPEN', url:'...'}
